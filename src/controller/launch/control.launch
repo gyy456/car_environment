@@ -1,0 +1,32 @@
+<launch>
+
+  <arg name="ns" default="jackal0"/>
+
+  <rosparam command="load" file="$(find controller)/config/control.yaml" ns="$(arg ns)"/>
+  
+  <param name="$(arg ns)/chassis_velocity_controller/base_frame_id"       value="$(arg ns)/base_link"/>
+  <param name="$(arg ns)/chassis_velocity_controller/odom_frame_id"       value="$(arg ns)/odom"/>
+
+  <!-- extra config files, 目前没有-->
+  <group if="$(optenv ROBOT_CONTROL_EXTRAS 0)" >
+    <rosparam command="load" file="$(env ROBOT_CONTROL_EXTRAS_PATH)" />
+  </group>
+
+<!--  <param name="tf_prefix" value="$(arg ns)" />-->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner"
+        args="chassis_joint_publisher chassis_velocity_controller turret_position_controller" ns="$(arg ns)">
+  </node>
+
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" ns="$(arg ns)">
+    <rosparam command="load" file="$(find controller)/config/local_ekf.yaml"/>
+<!--    <param name="map_frame"       value="map"/>-->
+    <param name="odom_frame"      value="$(arg ns)/odom"/>
+    <param name="base_link_frame" value="$(arg ns)/base_link"/>
+    <param name="world_frame"     value="$(arg ns)/odom"/>
+<!--    <remap from="odometry/filtered" to="odometry/local_filtered"/>-->
+  </node>
+
+  <node pkg="topic_tools" type="relay" name="cmd_vel_relay"
+        args="cmd_vel chassis_velocity_controller/cmd_vel" ns="$(arg ns)"/>
+
+</launch>

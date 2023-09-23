@@ -1,0 +1,8 @@
+prefix=/home/gyy/Downloads/car/install
+
+Name: description
+Description: Description of description
+Version: 0.2.2
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

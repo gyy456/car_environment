@@ -1,0 +1,4 @@
+# The base configuration has only the
+# optional SICK LMS111 front laser.
+
+ROBOT_FRONT_SICK_LASER=1

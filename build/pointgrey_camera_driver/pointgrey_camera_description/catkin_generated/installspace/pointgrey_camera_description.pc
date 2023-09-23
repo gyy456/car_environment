@@ -1,0 +1,8 @@
+prefix=/home/gyy/Downloads/car/install
+
+Name: pointgrey_camera_description
+Description: Description of pointgrey_camera_description
+Version: 0.13.4
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

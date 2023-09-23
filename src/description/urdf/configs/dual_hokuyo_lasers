@@ -1,0 +1,5 @@
+# The dual_laser configuration with
+# the Hokuyo UST-10LX LIDAR on the front and rear
+
+ROBOT_FRONT_HOKUYO_LASER=1
+ROBOT_REAR_HOKUYO_LASER=1

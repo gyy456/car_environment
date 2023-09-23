@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>controller</name>
+  <version>0.2.2</version>
+  <description>Controllers for Robot</description>
+
+  <maintainer email="lab@todo.todo">lab</maintainer>
+  
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>controller_interface</depend>
+  <depend>controller_manager</depend>
+  <depend>realtime_tools</depend>
+  <depend>urdf</depend>
+
+  <exec_depend>interactive_marker_twist_server</exec_depend>
+  <exec_depend>joint_state_controller</exec_depend>
+  <exec_depend>joy</exec_depend>
+  <exec_depend>robot_localization</exec_depend>
+  <exec_depend>teleop_twist_joy</exec_depend>
+  <exec_depend>topic_tools</exec_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>libgazebo9-dev</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>std_srvs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>tf</build_depend>
+
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>gazebo</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>tf</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
+
+  <test_depend>roslaunch</test_depend>
+
+  <export>
+    <controller_interface plugin="${prefix}/mecanum_drive_controller_plugins.xml"/>
+  </export>
+</package>

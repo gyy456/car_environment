@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<launch>
+  <arg name="rviz"                      default="true"/>
+  <arg name="gui"                       default="false" />
+  <arg name="use_sim_time"              default="true" />
+  <arg name="headless"                  default="false" />
+  <arg name="world_name"                default="$(find simulator)/worlds/2020Tag_obstacle.world"/>
+
+  <!-- Configuration of Jackal which you would like to simulate.
+       See jackal_description for details. -->
+  <arg name="config"  default="empty" />
+  <arg name="ns0"     default="jackal0" />
+
+  <!-- <arg name="config" default="custom" /> -->
+
+  <!-- Launch Gazebo with the specified world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="debug" value="false" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="use_sim_time" value="$(arg use_sim_time)" />
+    <arg name="headless" value="$(arg headless)" />
+    <arg name="world_name" value="$(arg world_name)" />
+  </include>
+
+   <node name="map_server" pkg="map_server" type="map_server" args="$(find simulator)/maps/map2020.yaml">
+   </node>node>
+
+    <include file="$(find simulator)/launch/robot_spawn.launch">
+      <arg name="init_a"                  value="0"/>
+      <arg name="init_x"                  value="0.6"/>
+      <arg name="init_y"                  value="0.6"/>
+      <arg name="robot_name"              value="$(arg ns0)" />
+      <arg name="ns"                      value="$(arg ns0)" />
+      <arg name="config"                  value="our_side" />
+    </include>
+
+  <node name="dynamic_obstacle" pkg="simulator" type="dynamic_obstacle" respawn="false"/>
+
+  <node name="simulate_refer_system" pkg="simulator" type="simulate_refer_system" respawn="false"/>
+
+  <!-- View in RVIZ. -->
+  <group if="$(arg rviz)">
+    <node name="robot_viz_$(arg ns0)" pkg="rviz" type="rviz" args="-d $(find simulator)/rviz/robot_viz.rviz" >
+      <remap from="/$(arg ns0)/goal" to="/$(arg ns0)/move_base_simple/goal"/>
+    </node>
+  </group>
+</launch>

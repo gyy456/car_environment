@@ -1,0 +1,8 @@
+prefix=/home/gyy/Downloads/car/devel
+
+Name: wfov_camera_msgs
+Description: Description of wfov_camera_msgs
+Version: 0.13.4
+Cflags: -I/home/gyy/Downloads/car/devel/include
+Libs: -L${prefix}/lib 
+Requires: message_runtime sensor_msgs

@@ -1,0 +1,8 @@
+prefix=/home/gyy/Downloads/car/devel
+
+Name: simulator
+Description: Description of simulator
+Version: 0.0.0
+Cflags: -I/home/gyy/Downloads/car/devel/include
+Libs: -L${prefix}/lib 
+Requires: message_runtime

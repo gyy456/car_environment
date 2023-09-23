@@ -1,0 +1,264 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <!-- This file is a placeholder which is included by default from
+       robot.urdf.xacro. If a robot is being customized and requires
+       additional URDF, set the ROBOT_URDF_EXTRAS environment variable
+       to the full path of the file you would like included. -->
+
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+    <link name="laser">
+      <inertial>
+        <mass value="1.1" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="${0.0833333 * 1.1 * (0.102*0.102 + 0.152*0.152)}" ixy="0.0" ixz="0.0"
+          iyy="${0.0833333 * 1.1 * (0.105*0.105 + 0.152*0.152)}" iyz="0.0"
+          izz="${0.0833333 * 1.1 * (0.105*0.105 + 0.102*0.102)}" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <!-- Origin of this mesh is the focal point of the LIDAR. -->
+          <mesh filename="package://lms1xx/meshes/sick-lms1xx.dae" />
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 -0.05" rpy="0 0 0" />
+        <geometry>
+          <box size="0.105 0.1 0.1" />
+        </geometry>
+      </collision>
+    </link>
+
+    <gazebo reference="laser">
+      <turnGravityOff>true</turnGravityOff>
+      <sensor type="ray" name="laser">
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>false</visualize>
+        <update_rate>20</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>720</samples>
+              <resolution>1</resolution>
+              <min_angle>-${M_PI}</min_angle>
+              <max_angle>${M_PI}</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.45</min>
+            <max>30.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.001</stddev>
+          </noise>
+        </ray>
+        <plugin name="gazebo_ros_laser" filename="libgazebo_ros_laser.so">
+          <topicName>scan</topicName>
+          <frameName>laser</frameName>
+          <robotNamespace>$(arg namespace)</robotNamespace>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+    <joint name="center_laser_joint" type="fixed">
+      <!-- This offset is from the base of the bracket to the LIDAR's focal point. -->
+      <origin xyz="0 0 0.3" rpy="0 0 0" />
+      <parent link="chassis_link" />
+      <child link="laser" />
+    </joint>
+
+  <!-- <xacro:sick_lms1xx_mount prefix="center"
+                             topic="scan"
+                             location="0" /> -->
+
+  <xacro:if value="$(optenv JACKAL_FLEA3 1)">
+
+  
+
+    <link name="front_camera_mount">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <mass value="5" />
+        <inertia
+          ixx="1.0" ixy="0.0" ixz="0.0"
+          iyy="1.0" iyz="0.0"
+          izz="1.0" />
+      </inertial>
+    </link>
+    
+    
+    <link name="front_camera_beam"> 
+    </link>
+
+    <joint name="front_camera_pivot_joint" type="revolute">
+
+        <origin xyz="0.14 0.002 0.008" rpy="0 0 0" />
+      <parent link="front_camera_mount" />
+      <child link="front_camera_beam" />
+      <!-- this velocity variable determines whether the joint rotates fast or slow -->
+      <limit upper="1.5707" lower="-1.5707" velocity="10" effort="2"/>
+       <axis xyz="0 0 1" />
+    </joint>
+
+    <transmission name="turret_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="front_camera_pivot_joint">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="turret_motor">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+    <gazebo reference="front_camera_beam">
+      <material>Gazebo/DarkGrey</material>
+    </gazebo>
+
+    <gazebo reference="front_camera_mount">
+      <material>Gazebo/DarkGrey</material>
+    </gazebo>
+
+    <camera_mount prefix="$(optenv JACKAL_FLEA_MOUNT front)"
+                       tilt="$(optenv JACKAL_FLEA_TILT 0)"/>
+    <joint name="$(optenv JACKAL_FLEA3_MOUNT front)_camera_mount_joint" type="fixed">
+      <origin xyz="$(optenv JACKAL_FLEA3_OFFSET -0.13 -0.01 0.22)"
+              rpy="$(optenv JACKAL_FLEA3_RPY 0 0 0)" />
+      <parent link="$(optenv JACKAL_FLEA_MOUNT front)_cover_link" />
+      <child link="$(optenv JACKAL_FLEA_MOUNT front)_camera_mount" />
+    </joint>
+    
+<!-- 
+      params="frame:=camera name:=camera camera_x:=0.0754 camera_y:=0.029 camera_z:=0.035 camera_mass:=0.085
+             hfov:=1.0471975512 fps:=120 width:=1272 height:=1016 format:=R8G8B8 near:=0.5 far:=300"> -->
+
+    <!-- <pointgrey_flea3 frame="$(optenv JACKAL_FLEA3_MOUNT front)_camera" name="$(optenv JACKAL_FLEA_NAME front)"
+      camera_x="0.0754" camera_y="0.029" camera_z="0.035"
+      camera_mass="0.98307" hfov="1.0471975512" fps="20" width="640" height="512"/> -->
+    <xacro:property name="camera_x" value="3.1415926535897931" />
+    <xacro:property name="camera_y" value="0.029" />
+    <xacro:property name="camera_z" value="0.035" />
+    <xacro:property name="camera_mass" value="0.98307" />
+    <xacro:property name="hfov" value="1.0471975512" />
+    <xacro:property name="fps" value="20" />
+    <xacro:property name="width" value="640" />
+    <xacro:property name="height" value="512" />
+    <xacro:property name="format" value="R8G8B8" />
+    <xacro:property name="near" value="0.5" />
+    <xacro:property name="far" value="300" />
+
+    <link name="front_camera">
+      <inertial>
+        <mass value="0.085" />
+      <inertia
+          ixx="0.0072228"
+          ixy="1.8624E-07"
+          ixz="5.1373E-07"
+          iyy="0.0035103"
+          iyz="-0.0016193"
+          izz="0.00443" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0.1" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://description/meshes/gun_new.STL"/>
+        </geometry>
+        <material name="Black">
+          <color rgba="0.15 0.15 0.15 1.0"/>
+        </material>
+      </visual>
+    </link>
+
+    <link name="front_camera_optical" />
+
+    <joint name="front_camera_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
+      <parent link="front_camera" />
+      <child link="front_camera_optical" />
+    </joint>
+
+    <!-- Gazebo -->
+    <gazebo reference="front_camera_optical">
+      <sensor name="camera" type="depth">
+        <update_rate>120</update_rate>
+        <camera>
+          <horizontal_fov>${hfov}</horizontal_fov>
+          <pose>0 0 0 0 -1.5707 1.5707</pose>
+          <image>
+            <width>${width}</width>
+            <height>${height}</height>
+            <format>${format}</format>
+          </image>
+          <clip>
+            <near>${near}</near>
+            <far>${far}</far>
+          </clip>
+        </camera>
+        <plugin name="camera_link_controller" filename="libgazebo_ros_openni_kinect.so">
+          <baseline>0.2</baseline>
+          <alwaysOn>true</alwaysOn>
+          <updateRate>0.0</updateRate>
+
+          <cameraName>front</cameraName>
+          <imageTopicName>image_raw </imageTopicName>
+          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+          <depthImageTopicName>depth/image_raw</depthImageTopicName>
+          <depthImageInfoTopicName>depth/camera_info</depthImageInfoTopicName>
+          <pointCloudTopicName>depth/points</pointCloudTopicName>
+          <frameName>front_camera_optical</frameName>
+          <pointCloudCutoff>0.05</pointCloudCutoff>
+          <pointCloudCutoffMax>10.0</pointCloudCutoffMax>
+          <distortionK1>0</distortionK1>
+          <distortionK2>0</distortionK2>
+          <distortionK3>0</distortionK3>
+          <distortionT1>0</distortionT1>
+          <distortionT2>0</distortionT2>
+          <CxPrime>0</CxPrime>
+          <Cx>0</Cx>
+          <Cy>0</Cy>
+          <focalLength>0</focalLength>
+          <hackBaseline>0</hackBaseline>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+  <gazebo reference="front_camera">
+      <material>Gazebo/DarkGrey</material>
+  </gazebo>
+
+    <joint name="$(optenv JACKAL_FLEA3_MOUNT front)_camera_bracket_joint" type="fixed">
+      <origin xyz="-0.1 0 0" rpy="0 0 0" />
+      <parent link="$(optenv JACKAL_FLEA3_MOUNT front)_camera_beam" />
+      <child link="front_camera" />
+    </joint>
+
+  <link name="camera_visualtag">
+  </link>
+
+  <joint name="visualtag_joint" type="fixed">
+    <origin xyz="0 0 0"
+            rpy="-1.57 0 -1.57" />
+    <parent link="front_camera" />
+    <child link="camera_visualtag" />
+  </joint>
+
+  <gazebo>
+    <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
+      <alwaysOn>true</alwaysOn>
+      <updateRate>50.0</updateRate>
+      <bodyName>base_link</bodyName>
+      <topicName>ground_truth/state</topicName>
+      <gaussianNoise>0.01</gaussianNoise>
+      <frameName>world</frameName>
+      <xyzOffsets>0 0 0</xyzOffsets>
+      <rpyOffsets>0 0 0</rpyOffsets>
+    </plugin>
+  </gazebo>
+
+  
+  </xacro:if>
+
+</robot>

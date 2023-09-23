@@ -1,0 +1,4 @@
+# The base configuration has only the
+# front laser.
+
+ROBOT_FRONT_HOKUYO_LASER=1
